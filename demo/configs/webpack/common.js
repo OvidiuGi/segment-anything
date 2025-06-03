@@ -70,7 +70,7 @@ module.exports = {
           to: "[name][ext]",
         },
         {
-          from: "src/model",
+          from: "model",
           to: "model",
         },
         {
