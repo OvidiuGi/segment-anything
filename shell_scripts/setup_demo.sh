@@ -9,9 +9,10 @@ set -e  # Exit on any error
 MODEL_URL="https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth"
 MODEL_TYPE="vit_h"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VENV_DIR="$SCRIPT_DIR/venv"
-CHECKPOINT_DIR="$SCRIPT_DIR/checkpoints"
-DEMO_MODEL_DIR="$SCRIPT_DIR/demo/model"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+VENV_DIR="$PROJECT_ROOT/venv"
+CHECKPOINT_DIR="$PROJECT_ROOT/checkpoints"
+DEMO_MODEL_DIR="$PROJECT_ROOT/demo/model"
 CHECKPOINT_PATH="$CHECKPOINT_DIR/sam_vit_h_4b8939.pth"
 ONNX_OUTPUT_PATH="$DEMO_MODEL_DIR/output.onnx"
 
@@ -40,6 +41,7 @@ pip install --upgrade pip
 pip install opencv-python pycocotools matplotlib onnxruntime onnx torch torchvision
 
 # Install segment_anything in development mode
+cd "$PROJECT_ROOT"
 pip install -e .
 
 echo "✅ All dependencies installed successfully"
@@ -63,6 +65,7 @@ fi
 # Export model to ONNX format
 echo ""
 echo "🔄 Exporting model to ONNX format..."
+cd "$PROJECT_ROOT"
 python scripts/export_onnx_model.py \
     --checkpoint "$CHECKPOINT_PATH" \
     --model-type "$MODEL_TYPE" \

@@ -12,14 +12,16 @@ if [ $# -eq 0 ]; then
 fi
 
 # Variables
-VENV_PATH="venv"
-GENERATE_SCRIPT="demo/generate_embedding.py"
-CHECKPOINT="checkpoints/sam_vit_h_4b8939.pth"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+VENV_PATH="$PROJECT_ROOT/venv"
+GENERATE_SCRIPT="$PROJECT_ROOT/demo/generate_embedding.py"
+CHECKPOINT="$PROJECT_ROOT/checkpoints/sam_vit_h_4b8939.pth"
 MODEL_TYPE="vit_h"
 IMAGE_NAME="$1"
 
 # Construct full image path (assuming images are in demo/src/assets/data/)
-IMAGE_PATH="demo/src/assets/data/$IMAGE_NAME"
+IMAGE_PATH="$PROJECT_ROOT/demo/src/assets/data/$IMAGE_NAME"
 
 # Check if virtual environment exists
 if [ ! -d "$VENV_PATH" ]; then
@@ -49,6 +51,7 @@ echo "Model type: $MODEL_TYPE"
 echo ""
 
 # Activate virtual environment and run the script
+cd "$PROJECT_ROOT"
 source "$VENV_PATH/bin/activate" && python "$GENERATE_SCRIPT" --checkpoint "$CHECKPOINT" --model-type "$MODEL_TYPE" --image "$IMAGE_PATH"
 
 # Check if the command was successful
@@ -56,7 +59,7 @@ if [ $? -eq 0 ]; then
     echo ""
     echo "✅ Embedding generation completed successfully!"
     # Show the generated embedding file
-    EMBEDDING_FILE="demo/src/assets/data/${IMAGE_NAME%.*}_embedding.npy"
+    EMBEDDING_FILE="$PROJECT_ROOT/demo/src/assets/data/${IMAGE_NAME%.*}_embedding.npy"
     if [ -f "$EMBEDDING_FILE" ]; then
         echo "📁 Embedding saved to: $EMBEDDING_FILE"
     fi
