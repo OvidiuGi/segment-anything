@@ -4,7 +4,7 @@
 // This source code is licensed under the license found in the
 // LICENSE file in the root directory of this source tree.
 
-import { InferenceSession, Tensor } from "onnxruntime-web";
+import { InferenceSession, Tensor, env } from "onnxruntime-web";
 import React, { useContext, useEffect, useState } from "react";
 import "./assets/scss/App.scss";
 import { handleImageScale } from "./components/helpers/scaleHelper";
@@ -35,18 +35,67 @@ const App = () => {
   // The modelScale state variable keeps track of the scale values.
   const [modelScale, setModelScale] = useState<modelScaleProps | null>(null);
 
+  // Configure ONNX Runtime for SIMD-threaded WASM
+  useEffect(() => {
+    // Configure ONNX Runtime to use threaded WASM files
+    env.wasm.wasmPaths = '/';
+    env.wasm.numThreads = navigator.hardwareConcurrency || 4; // Use available CPU cores
+    env.wasm.simd = true; // Enable SIMD instructions for better performance
+
+    // Configure for Cross-Origin Isolation (needed for SharedArrayBuffer in threaded WASM)
+    if (typeof SharedArrayBuffer === 'undefined') {
+      console.warn('SharedArrayBuffer not available - threaded WASM may not work');
+      env.wasm.numThreads = 1; // Fallback to single-threaded
+    }
+
+    console.log("ONNX Runtime configured for SIMD-threaded execution");
+    console.log("Threads:", env.wasm.numThreads, "SIMD:", env.wasm.simd);
+    console.log("SharedArrayBuffer available:", typeof SharedArrayBuffer !== 'undefined');
+  }, []);
+
   // Initialize the ONNX model. load the image, and load the SAM
   // pre-computed image embedding
   useEffect(() => {
     // Initialize the ONNX model
     const initModel = async () => {
       try {
-        if (MODEL_DIR === undefined) return;
-        const URL: string = MODEL_DIR;
-        const model = await InferenceSession.create(URL);
+        console.log("1. Starting model initialization...");
+
+        // Configure execution providers in order of preference
+        const sessionOptions = {
+          executionProviders: [
+            'wasm', // Standard WebAssembly provider (most compatible)
+          ]
+        };
+
+        // Try simple loading first with explicit execution providers
+        const model = await InferenceSession.create(MODEL_DIR, sessionOptions);
+        console.log("2. Model loaded successfully:", model);
         setModel(model);
+
       } catch (e) {
-        console.log(e);
+        console.error("3. Simple loading failed:", e);
+
+        // Fallback to fetch approach with explicit options
+        try {
+          console.log("4. Trying fetch approach...");
+          const response = await fetch(MODEL_DIR);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const modelArrayBuffer = await response.arrayBuffer();
+          const modelData = new Uint8Array(modelArrayBuffer);
+
+          const model = await InferenceSession.create(modelData, {
+            executionProviders: ['wasm'],
+            graphOptimizationLevel: 'basic' as const,
+            executionMode: 'sequential' as const,
+          });
+          console.log("5. Model loaded via fetch:", model);
+          setModel(model);
+        } catch (fallbackError) {
+          console.error("6. All loading attempts failed:", fallbackError);
+        }
       }
     };
     initModel();

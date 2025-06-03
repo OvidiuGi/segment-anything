@@ -70,6 +70,10 @@ module.exports = {
           to: "[name][ext]",
         },
         {
+          from: "node_modules/onnxruntime-web/dist/*.mjs",
+          to: "[name][ext]",
+        },
+        {
           from: "model",
           to: "model",
         },
