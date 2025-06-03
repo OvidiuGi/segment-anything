@@ -20,6 +20,10 @@ interface contextProps {
     maskImg: HTMLImageElement | null,
     setMaskImg: (e: HTMLImageElement | null) => void
   ];
+  savedMasks: [
+    savedMasks: { mask: HTMLImageElement; colorGroup: number }[],
+    setSavedMasks: (e: { mask: HTMLImageElement; colorGroup: number }[]) => void
+  ];
 }
 
 const AppContext = createContext<contextProps | null>(null);

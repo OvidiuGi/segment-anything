@@ -9,10 +9,11 @@ import AppContext from "./hooks/createContext";
 import { ToolProps } from "./helpers/Interfaces";
 import * as _ from "underscore";
 
-const Tool = ({ handleMouseMove }: ToolProps) => {
+const Tool = ({ handleMouseMove, handleClick }: ToolProps) => {
   const {
     image: [image],
     maskImg: [maskImg, setMaskImg],
+    savedMasks: [savedMasks],
   } = useContext(AppContext)!;
 
   // Determine if we should shrink or grow the images to match the
@@ -43,6 +44,7 @@ const Tool = ({ handleMouseMove }: ToolProps) => {
 
   const imageClasses = "";
   const maskImageClasses = `absolute opacity-40 pointer-events-none`;
+  const savedMaskClasses = `absolute opacity-30 pointer-events-none`;
 
   // Render the image and the predicted mask image on top
   return (
@@ -52,18 +54,30 @@ const Tool = ({ handleMouseMove }: ToolProps) => {
           onMouseMove={handleMouseMove}
           onMouseOut={() => _.defer(() => setMaskImg(null))}
           onTouchStart={handleMouseMove}
+          onClick={handleClick}
           src={image.src}
-          className={`${
-            shouldFitToWidth ? "w-full" : "h-full"
-          } ${imageClasses}`}
+          className={`${shouldFitToWidth ? "w-full" : "h-full"
+            } ${imageClasses} cursor-crosshair`}
         ></img>
       )}
+      {/* Render saved masks */}
+      {savedMasks.map((savedMaskObj, index) => (
+        <img
+          key={index}
+          src={savedMaskObj.mask.src}
+          className={`${shouldFitToWidth ? "w-full" : "h-full"
+            } ${savedMaskClasses}`}
+          style={{
+            filter: `hue-rotate(${savedMaskObj.colorGroup * 60}deg) saturate(1.5)`,
+          }}
+        ></img>
+      ))}
+      {/* Render current hover mask */}
       {maskImg && (
         <img
           src={maskImg.src}
-          className={`${
-            shouldFitToWidth ? "w-full" : "h-full"
-          } ${maskImageClasses}`}
+          className={`${shouldFitToWidth ? "w-full" : "h-full"
+            } ${maskImageClasses}`}
         ></img>
       )}
     </>

@@ -18,6 +18,12 @@ module.exports = {
   output: {
     path: resolve(__dirname, "dist"),
   },
+  ignoreWarnings: [
+    {
+      module: /onnxruntime-web/,
+      message: /Critical dependency: require function is used in a way in which dependencies cannot be statically extracted/,
+    },
+  ],
   module: {
     rules: [
       {
@@ -64,7 +70,7 @@ module.exports = {
           to: "[name][ext]",
         },
         {
-          from: "model",
+          from: "src/model",
           to: "model",
         },
         {

@@ -18,9 +18,9 @@ const ort = require("onnxruntime-web");
 import npyjs from "npyjs";
 
 // Define image, embedding and model paths
-const IMAGE_PATH = "/assets/data/dogs.jpg";
-const IMAGE_EMBEDDING = "/assets/data/dogs_embedding.npy";
-const MODEL_DIR = "/model/sam_onnx_quantized_example.onnx";
+const IMAGE_PATH = "/assets/data/casaTest.png";
+const IMAGE_EMBEDDING = "/assets/data/casaTest_embedding.npy";
+const MODEL_DIR = "/model/output.onnx";
 
 const App = () => {
   const {
@@ -72,8 +72,8 @@ const App = () => {
           width: width,  // original image width
           samScale: samScale, // scaling factor for image which has been resized to longest side 1024
         });
-        img.width = width; 
-        img.height = height; 
+        img.width = width;
+        img.height = height;
         setImage(img);
       };
     } catch (error) {
