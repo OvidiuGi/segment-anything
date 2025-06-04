@@ -18,8 +18,16 @@ const ort = require("onnxruntime-web");
 import npyjs from "npyjs";
 
 // Define image, embedding and model paths
-const IMAGE_PATH = "/assets/data/casaTest.png";
-const IMAGE_EMBEDDING = "/assets/data/casaTest_embedding.npy";
+const getImagePath = (imageId: string) => {
+  const extensions: { [key: string]: string } = {
+    "1": "jpg",
+    "2": "png",
+    "3": "jpg"
+  };
+  return `/assets/data/${imageId}.${extensions[imageId]}`;
+};
+
+const getImageEmbedding = (imageId: string) => `/assets/data/${imageId}_embedding.npy`;
 const MODEL_DIR = "/model/output.onnx";
 
 const App = () => {
@@ -27,6 +35,7 @@ const App = () => {
     clicks: [clicks],
     image: [, setImage],
     maskImg: [, setMaskImg],
+    selectedImageId: [selectedImageId],
   } = useContext(AppContext)!;
   const [model, setModel] = useState<InferenceSession | null>(null); // ONNX model
   const [tensor, setTensor] = useState<Tensor | null>(null); // Image embedding tensor
@@ -101,14 +110,16 @@ const App = () => {
     initModel();
 
     // Load the image
-    const url = new URL(IMAGE_PATH, location.origin);
+    const imagePath = getImagePath(selectedImageId);
+    const url = new URL(imagePath, location.origin);
     loadImage(url);
 
     // Load the Segment Anything pre-computed embedding
-    Promise.resolve(loadNpyTensor(IMAGE_EMBEDDING, "float32")).then(
+    const embeddingPath = getImageEmbedding(selectedImageId);
+    Promise.resolve(loadNpyTensor(embeddingPath, "float32")).then(
       (embedding) => setTensor(embedding)
     );
-  }, []);
+  }, [selectedImageId]); // Add selectedImageId as dependency to reload when image changes
 
   const loadImage = async (url: URL) => {
     try {

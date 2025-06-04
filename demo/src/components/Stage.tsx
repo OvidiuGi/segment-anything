@@ -7,6 +7,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import * as _ from "underscore";
 import Tool from "./Tool";
+import ImageSwitcher from "./ImageSwitcher";
 import { modelInputProps } from "./helpers/Interfaces";
 import AppContext from "./hooks/createContext";
 
@@ -287,6 +288,9 @@ const Stage = () => {
       <div className={`${flexCenterClasses} relative w-[90%] h-[90%]`}>
         <Tool handleMouseMove={handleMouseMove} handleClick={handleClick} />
 
+        {/* Image Switcher */}
+        <ImageSwitcher />
+
         {/* Control Panel */}
         <div className="absolute top-4 right-4 flex flex-col gap-2 bg-white/90 p-3 rounded-lg shadow-lg">
           <div className="text-sm font-semibold text-gray-800">
@@ -400,6 +404,7 @@ const Stage = () => {
         <div className="absolute bottom-4 left-4 bg-white/90 p-3 rounded-lg shadow-lg max-w-sm">
           <div className="text-sm text-gray-800">
             <div className="font-semibold mb-2">Instructions:</div>
+            <div>• Use Image Switcher to change images</div>
             <div>• Hover to preview masks</div>
             <div>• Left-click to save mask (new color)</div>
             <div>• Press 'S' to save current (new color)</div>

@@ -24,6 +24,10 @@ interface contextProps {
     savedMasks: { mask: HTMLImageElement; colorGroup: number }[],
     setSavedMasks: (e: { mask: HTMLImageElement; colorGroup: number }[]) => void
   ];
+  selectedImageId: [
+    selectedImageId: string,
+    setSelectedImageId: (e: string) => void
+  ];
 }
 
 const AppContext = createContext<contextProps | null>(null);

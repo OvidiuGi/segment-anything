@@ -15,6 +15,7 @@ const AppContextProvider = (props: {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [maskImg, setMaskImg] = useState<HTMLImageElement | null>(null);
   const [savedMasks, setSavedMasks] = useState<{ mask: HTMLImageElement; colorGroup: number }[]>([]);
+  const [selectedImageId, setSelectedImageId] = useState<string>("2"); // Default to "2" to match current hardcoded image
 
   return (
     <AppContext.Provider
@@ -23,6 +24,7 @@ const AppContextProvider = (props: {
         image: [image, setImage],
         maskImg: [maskImg, setMaskImg],
         savedMasks: [savedMasks, setSavedMasks],
+        selectedImageId: [selectedImageId, setSelectedImageId],
       }}
     >
       {props.children}
